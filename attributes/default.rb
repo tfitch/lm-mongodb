@@ -79,7 +79,7 @@ default[:mongodb][:package_name] = 'mongodb-server'
 default[:mongodb][:sysconfig_file] = '/etc/sysconfig/mongodb'
 default[:mongodb][:user] = 'mongod'
 default[:mongodb][:group] = 'mongod'
-default[:mongodb][:init_script_template] = 'redhat-mongodb.init.erb'
+default[:mongodb][:init_script_template] = 'mongodb.init.erb'
 default[:mongodb][:default_init_name] = 'mongod'
 default[:mongodb][:instance_name] = 'mongod'
 # then there is this guy
@@ -89,7 +89,7 @@ if node['platform'] == 'centos' || node['platform'] == 'amazon'
   default[:mongodb][:package_name] = 'mongodb-org'
 end
 
-default[:mongodb][:template_cookbook] = 'mongodb'
+default[:mongodb][:template_cookbook] = 'lm-mongodb'
 
 default[:mongodb][:key_file_content] = nil
 

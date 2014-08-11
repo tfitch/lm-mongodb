@@ -80,7 +80,7 @@ end
 package 'mongodb-org' do
   options '--nogpgcheck'
   action :install
-  version '2.6.1-2'
+  version '2.6.3-1'
 end
 
 

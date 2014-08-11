@@ -35,9 +35,62 @@ end
 #  enabled true
 # end
 
+# prevent-install defaults, but don't overwrite
+file node['mongodb']['sysconfig_file'] do
+  content 'ENABLE_MONGODB=no'
+  group node['mongodb']['root_group']
+  owner 'root'
+  mode 0644
+  action :create_if_missing
+end
+
+# just-in-case config file drop
+template node['mongodb']['dbconfig_file'] do
+  cookbook node['mongodb']['template_cookbook']
+  source node['mongodb']['dbconfig_file_template']
+  group node['mongodb']['root_group']
+  owner 'root'
+  mode 0644
+  variables(
+    :config => node['mongodb']['config']
+  )
+  helpers MongoDBConfigHelpers
+  action :create_if_missing
+end
+
+init_file = File.join(node['mongodb']['init_dir'], "#{node['mongodb']['default_init_name']}")
+template init_file do
+  cookbook node['mongodb']['template_cookbook']
+  source node['mongodb']['init_script_template']
+  group node['mongodb']['root_group']
+  owner 'root'
+  mode '0755'
+  variables(
+    :provides =>       'mongod',
+    :sysconfig_file => node['mongodb']['sysconfig_file'],
+    :ulimit =>         node['mongodb']['ulimit'],
+    :bind_ip =>        node['mongodb']['config']['bind_ip'],
+    :port =>           node['mongodb']['config']['port']
+  )
+  action :create_if_missing
+end
+
+
 # install
 package 'mongodb-org' do
   options '--nogpgcheck'
   action :install
-  version '2.6.3-1'
+  version '2.6.1-2'
+end
+
+
+# Create keyFile if specified
+if node[:mongodb][:key_file_content]
+  file node[:mongodb][:config][:keyFile] do
+    owner node[:mongodb][:user]
+    group node[:mongodb][:group]
+    mode  '0600'
+    backup false
+    content node[:mongodb][:key_file_content]
+  end
 end
